@@ -1,12 +1,20 @@
 pub mod domme;
 pub mod html;
 
-use std::iter::FromIterator;
+use std::env;
+use std::fs::File;
+use std::io::prelude::*;
 
 fn main() {
-    let vec = Vec::from_iter((0..100).into_iter());
+    let filename = "simple.html";
+    println!("In file {}", filename);
+    
+    let mut f = File::open(filename).expect("File not found!");
+    let mut contents = String::new();
+    f.read_to_string(&mut contents).expect("Reading file failed!");
 
-    for a in vec {
-        println!("Something: {:?}", a);
-    }
+    println!("Trying to parse file contents\n{}", contents);
+
+    let root: domme::Node = html::parse(contents);
+    println!("{:#?}", root);
 }

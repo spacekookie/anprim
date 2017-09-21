@@ -1,4 +1,6 @@
 use std::collections::{HashMap,HashSet};
+use std::fmt;
+
 pub type AttributeMap = HashMap<String, String>;
 
 
@@ -14,19 +16,16 @@ pub enum NodeType {
     Text(String),
 }
 
-
 #[derive(Debug)]
 pub struct ElementData {
     pub tag_name: String,
     pub attributes: AttributeMap,
 }
 
-
 /** Simple text constructor */
 pub fn text(data: String) -> Node {
     return Node { children: Vec::new(), node_type: NodeType::Text(data) }
 }
-
 
 pub fn elem(name: String, attr: AttributeMap, children: Vec<Node>) -> Node {
     return Node {
@@ -37,7 +36,6 @@ pub fn elem(name: String, attr: AttributeMap, children: Vec<Node>) -> Node {
         })
     }
 }
-
 
 impl ElementData {
     pub fn id(&self) -> Option<&String> {
@@ -52,3 +50,17 @@ impl ElementData {
     }
 }
 
+impl fmt::Display for ElementData {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        return write!(f, "< {} >", self.tag_name);
+    }
+}
+
+impl fmt::Display for NodeType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        return match *self {
+            NodeType::Element(ref x) => write!(f, "({})", x),
+            NodeType::Text(ref x) => write!(f, "({})", x),
+        }
+    }
+}
