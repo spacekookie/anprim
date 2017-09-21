@@ -1,6 +1,6 @@
 [package]
 name = "rustyengine"
 version = "0.1.0"
-authors = ["spacekookie"]
+authors = ["Katharina 'spacekookie' Fey <kookie@spacekookie.de>"]
 
 [dependencies]
