@@ -1,0 +1,6 @@
+[package]
+name = "oldandrusty"
+version = "0.1.0"
+authors = ["spacekookie"]
+
+[dependencies]
