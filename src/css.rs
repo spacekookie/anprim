@@ -1,53 +1,57 @@
+/// A super simple CSS which parser for a very simple browser-engine
+///
+/// It only supports a small subset of CSS syntax and doesn't throw errors
+/// for everything that could go wrong. Should probably improve that :)
 
 use std::ascii::AsciiExt;
 
-/**
- * Parse a CSS file as a string. Returns a stylesheet
- */ 
-pub fn parse(source: String) -> Stylesheet {
-    let mut parser = Parser {
-        pos: 0,
-        input: source,
-    };
-    Stylesheet { rules: parser.parse_rules() }
-}
+
+// Define our CSS data types
 
 
+#[derive(Debug)]
 pub struct Stylesheet {
     rules: Vec<Rule>,
 }
 
+#[derive(Debug)]
 pub struct Rule {
     selectors: Vec<Selector>,
     declarations: Vec<Declaration>,
 }
 
+#[derive(Debug)]
+pub enum Selector {
+    Simple(SimpleSelector),
+}
+
+#[derive(Debug)]
 pub struct SimpleSelector {
     tag_name: Option<String>,
     id: Option<String>,
     class: Vec<String>,
 }
 
-pub enum Selector {
-    Simple(SimpleSelector),
-}
-
+#[derive(Debug)]
 pub struct Declaration {
     name: String,
     value: Value,
 }
 
+#[derive(Debug)]
 pub enum Value {
     Keyword(String),
     Length(f32, Unit),
     ColourValue(Colour),
 }
 
+#[derive(Debug)]
 pub enum Unit {
     PX,
 }
 
 /* Colour spelt correctly */
+#[derive(Debug)]
 pub struct Colour {
     r: u8,
     g: u8,
@@ -56,11 +60,6 @@ pub struct Colour {
 }
 
 pub type Specificity = (usize, usize, usize);
-
-struct Parser {
-    pos: usize,
-    input: String,
-}
 
 impl Selector {
 
@@ -77,28 +76,56 @@ impl Selector {
     }
 }
 
+impl Value {
+    pub fn to_px(&self) -> f32 {
+        return match *self {
+            Value::Length(f, Unit::PX) => f,
+            _ => 0.0,
+        }
+    }
+}
+
+
+/// Parse an entire CSS sheet and return a Stylesheet
+pub fn parse(src: String) -> Stylesheet {
+    let mut parser = Parser {
+        pos: 0,
+        input: src,
+    };
+
+    return Stylesheet {
+        rules: parser.parse_rules()
+    }
+}
+
+
+struct Parser {
+    pos: usize,
+    input: String,
+}
+
 
 impl Parser {
+
+    fn parse_rules(&mut self) -> Vec<Rule> {
+        let mut rules = Vec::new();
+        loop {
+            self.white_genocide();
+            if self.eof() {
+                break;
+            }
+
+            rules.push(self.parse_rule());
+        }
+
+        return rules;
+    }
 
     fn parse_rule(&mut self) -> Rule {
         Rule {
             selectors: self.parse_selectors(),
             declarations: self.parse_declarations()
         }
-    }
-
-    fn parse_rules(&mut self) -> Vec<Rule> {
-        let mut rules = Vec::new();
-        loop {
-            self.white_genocide();
-        }
-
-        return rules;
-    }
-
-    /** KILL ALL WHITES(paces) */
-    fn white_genocide(&mut self) {
-        self.consume_while(char::is_whitespace);
     }
 
     fn parse_selectors(&mut self) -> Vec<Selector> {
@@ -245,6 +272,11 @@ impl Parser {
 
     fn eof(&mut self) -> bool {
         return self.pos >= self.input.len();
+    }
+
+    /** KILL ALL WHITES(paces) */
+    fn white_genocide(&mut self) {
+        self.consume_while(char::is_whitespace);
     }
 
     /** Eat characters from buffer until function tells us we're full */
