@@ -66,7 +66,10 @@ impl Parser {
         return rules;
     }
 
-    fn white_genocide(&mut self) {}
+    /** KILL ALL WHITES(paces) */
+    fn white_genocide(&mut self) {
+        self.consume_while(char::is_whitespace);
+    }
 
     fn parse_simple_selector(&mut self) -> SimpleSelector {
         let mut selector = SimpleSelector {
@@ -75,15 +78,41 @@ impl Parser {
             class: Vec::new(),
         };
 
-        while !self.eof() {}
+        while !self.eof() {
+            match self.next_char() {
+                '#' => {
+                    self.consume_char();
+                    selector.id = Some(self.parse_identifier());
+                }
+                '.' => {
+                    self.consume_char();
+                    selector.class.push(self.parse_identifier());
+                }
+                '*' => {
+                    // Universal selector
+                    self.consume_char();
+                }
+
+                c if valid_identifier_char(c) => {
+                    selector.tag_name = Some(self.parse_identifier());
+                }
+
+                _ => break
+            }
+        }
 
         return selector;
     }
 
-    fn eof(&mut self) -> bool {
-        return false;
+    fn parse_identifier(&mut self) -> String {
+        return self.consume_while(valid_identifier_char);
     }
 
+    fn eof(&mut self) -> bool {
+        return self.pos >= self.input.len();
+    }
+
+    /** Eat characters from buffer until function tells us we're full */
     fn consume_while<F>(&mut self, test: F) -> String
     where
         F: Fn(char) -> bool,
@@ -95,7 +124,7 @@ impl Parser {
         return result;
     }
 
-    /* Like consume_char but with a diet */
+    /* Like consume_char but on a diet */
     fn next_char(&self) -> char {
         return self.input[self.pos..].chars().next().unwrap();
     }
@@ -107,5 +136,14 @@ impl Parser {
         let (next_pos, _) = iter.next().unwrap_or((1, ' '));
         self.pos += next_pos;
         return cur_char;
+    }
+}
+
+
+/* Small utility function to determine what's a real char and what's not */
+fn valid_identifier_char(c: char) -> bool {
+    match c {
+        'a'...'z' | 'A'...'Z' | '0'...'9' | '-' | '_' => true,
+        _ => false
     }
 }
