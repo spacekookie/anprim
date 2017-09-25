@@ -7,6 +7,8 @@ use std::fs::File;
 use std::io::prelude::*;
 
 fn main() {
+
+    // TODO: Read file from stdin for now?
     let filename = "../simple.html";
     println!("In file {}", filename);
 
