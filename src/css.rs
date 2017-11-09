@@ -35,20 +35,20 @@ pub struct Declaration {
     pub value: Value,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Value {
     Keyword(String),
     Length(f32, Unit),
     ColourValue(Colour),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Unit {
     PX,
 }
 
 /* Colour spelt correctly */
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Colour {
     pub r: u8,
     pub g: u8,
