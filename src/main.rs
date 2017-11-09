@@ -1,8 +1,13 @@
+//! A very simple (and pointless) browser engine to learn Rust with
+//!
+//! Please don't ever take this project seriously. Or use it's code for anything.
+//! There is a lot of code duplication and I'm kinda learning on the go :)
+
+
 pub mod domme;
 pub mod html;
 pub mod css;
 
-use std::env;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -15,7 +20,6 @@ fn main() {
     let css = test_css_parser("sample.css");
     println!("{:?}", css);
 }
-
 
 fn test_html_parser(path: &str) -> domme::Node {
     let mut f = File::open(path).expect("File not found!");

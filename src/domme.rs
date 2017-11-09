@@ -22,7 +22,7 @@ pub struct ElementData {
     pub attributes: AttributeMap,
 }
 
-/** Simple text constructor */
+/// Simple text constructor
 pub fn text(data: String) -> Node {
     return Node { children: Vec::new(), node_type: NodeType::Text(data) }
 }

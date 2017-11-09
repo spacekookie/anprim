@@ -1,12 +1,9 @@
-/// A super simple CSS which parser for a very simple browser-engine
-///
-/// It only supports a small subset of CSS syntax and doesn't throw errors
-/// for everything that could go wrong. Should probably improve that :)
+//! A super simple CSS which parser for a very simple browser-engine
+//!
+//! It only supports a small subset of CSS syntax and doesn't throw errors
+//! for everything that could go wrong. Should probably improve that :)
 
 use std::ascii::AsciiExt;
-
-
-// Define our CSS data types
 
 
 #[derive(Debug)]
@@ -63,10 +60,9 @@ pub type Specificity = (usize, usize, usize);
 
 impl Selector {
 
-    /** 
-     * To find out moar go to 
-     *   http://www.w3.org/TR/selectors/#specificity
-     */
+    /// To find out moar go to 
+    ///    http://www.w3.org/TR/selectors/#specificity
+    ///
     pub fn specificity(&self) -> Specificity {
         let Selector::Simple(ref simple) = *self;
         let a = simple.id.iter().count();
@@ -268,18 +264,18 @@ impl Parser {
         return self.consume_while(valid_identifier_char);
     }
 
-    /* Some generic parser functions below */
+    /******* Some generic parser functions below *******/
 
     fn eof(&mut self) -> bool {
         return self.pos >= self.input.len();
     }
 
-    /** KILL ALL WHITES(paces) */
+    /// KILL ALL WHITES(paces)
     fn white_genocide(&mut self) {
         self.consume_while(char::is_whitespace);
     }
 
-    /** Eat characters from buffer until function tells us we're full */
+    /// Eat characters from buffer until function tells us we're full
     fn consume_while<F>(&mut self, test: F) -> String
     where
         F: Fn(char) -> bool,
@@ -291,12 +287,12 @@ impl Parser {
         return result;
     }
 
-    /* Like consume_char but on a diet */
+    /// Like consume_char but on a diet
     fn next_char(&self) -> char {
         return self.input[self.pos..].chars().next().unwrap();
     }
 
-    /* Consume one character from the input */
+    /// Consume one character from the input
     fn consume_char(&mut self) -> char {
         let mut iter = self.input[self.pos..].char_indices();
         let (_, cur_char) = iter.next().unwrap();
@@ -307,7 +303,7 @@ impl Parser {
 }
 
 
-/* Small utility function to determine what's a real char and what's not */
+/// Small utility function to determine what's a real char and what's not
 fn valid_identifier_char(c: char) -> bool {
     match c {
         'a'...'z' | 'A'...'Z' | '0'...'9' | '-' | '_' => true,
