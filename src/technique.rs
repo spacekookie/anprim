@@ -1,17 +1,38 @@
 //! I didn't want to call it "style" because I'm an idiot 😂
 
 use css::{Rule, Selector, SimpleSelector, Specificity, Stylesheet, Value};
-use domme::{ElementData, Node, NodeType};
+use domme::{ElementData, Node};
+use domme::NodeType::{Element, Text};
+
 use std::collections::HashMap;
 
 
 type PropertyMap = HashMap<String, Value>;
 type MatchedRule<'a> = (Specificity, &'a Rule);
 
-struct StyledNode<'a> {
-    node: &'a Node,
-    specified_values: PropertyMap,
-    children: Vec<StyledNode<'a>>,
+pub struct StyledNode<'a> {
+    pub node: &'a Node,
+    pub specified_values: PropertyMap,
+    pub children: Vec<StyledNode<'a>>,
+}
+
+
+/// Apply a stylesheet to an entire DOM tree, returning a StyledNode tree
+/// 
+/// This only deals with specified values and simple selectors for now and 
+/// as you might expect...none of it cascades in any way
+pub fn style_tree<'a>(root: &'a Node, stylesheet: &'a Stylesheet) -> StyledNode<'a> {
+
+    return StyledNode {
+        node: root,
+        specified_values: match root.node_type {
+            Element(ref elem) => specified_values(elem, stylesheet),
+            Text(_) => HashMap::new()
+        },
+        children: root.children.iter().map(|c| style_tree(c, stylesheet)).collect(),
+
+    };
+
 }
 
 
@@ -26,6 +47,22 @@ fn match_rule<'a>(elem: &ElementData, rule: &'a Rule) -> Option<MatchedRule<'a>>
 
 fn matching_rules<'a>(elem: &ElementData, sheet: &'a Stylesheet) -> Vec<MatchedRule<'a>> {
     return sheet.rules.iter().filter_map(|rule| match_rule(elem, rule)).collect();
+}
+
+
+fn specified_values(elem: &ElementData, sheet: &Stylesheet) -> PropertyMap {
+    let mut values = HashMap::new();
+    let mut rules = matching_rules(elem, sheet);
+
+    // Sort by specificity
+    rules.sort_by(|&(a, _), &(b, _)| a.cmp(&b));
+    for (_, rule) in rules {
+        for decl in &rule.declarations {
+            values.insert(decl.name.clone(), decl.value.clone());
+        }
+    }
+
+    return values;
 }
 
 
