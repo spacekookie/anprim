@@ -7,6 +7,9 @@
 pub mod domme;
 pub mod html;
 pub mod css;
+pub mod technique;
+
+mod tests;
 
 use std::fs::File;
 use std::io::prelude::*;
