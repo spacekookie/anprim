@@ -18,21 +18,21 @@ pub struct StyledNode<'a> {
 
 
 /// Apply a stylesheet to an entire DOM tree, returning a StyledNode tree
-/// 
-/// This only deals with specified values and simple selectors for now and 
+///
+/// This only deals with specified values and simple selectors for now and
 /// as you might expect...none of it cascades in any way
 pub fn style_tree<'a>(root: &'a Node, stylesheet: &'a Stylesheet) -> StyledNode<'a> {
-
     return StyledNode {
         node: root,
         specified_values: match root.node_type {
             Element(ref elem) => specified_values(elem, stylesheet),
-            Text(_) => HashMap::new()
+            Text(_) => HashMap::new(),
         },
-        children: root.children.iter().map(|c| style_tree(c, stylesheet)).collect(),
-
+        children: root.children
+            .iter()
+            .map(|c| style_tree(c, stylesheet))
+            .collect(),
     };
-
 }
 
 
@@ -46,7 +46,11 @@ fn match_rule<'a>(elem: &ElementData, rule: &'a Rule) -> Option<MatchedRule<'a>>
 
 
 fn matching_rules<'a>(elem: &ElementData, sheet: &'a Stylesheet) -> Vec<MatchedRule<'a>> {
-    return sheet.rules.iter().filter_map(|rule| match_rule(elem, rule)).collect();
+    return sheet
+        .rules
+        .iter()
+        .filter_map(|rule| match_rule(elem, rule))
+        .collect();
 }
 
 
